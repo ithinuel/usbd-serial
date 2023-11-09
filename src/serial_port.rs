@@ -57,10 +57,11 @@ where
         comm_if_name: Option<&'static str>,
         data_if_name: Option<&'static str>,
     ) -> SerialPort<'a, B, DefaultBufferStore, DefaultBufferStore> {
+        #[allow(invalid_value)]
         SerialPort::new_with_store_and_interface_names(
             alloc,
-            unsafe { mem::uninitialized() },
-            unsafe { mem::uninitialized() },
+            unsafe {  mem::MaybeUninit::uninit().assume_init() },
+            unsafe { mem::MaybeUninit::uninit().assume_init() },
             comm_if_name,
             data_if_name,
         )
@@ -166,7 +167,7 @@ where
         }
 
         let r = buf.read(data.len(), |buf_data| {
-            &data[..buf_data.len()].copy_from_slice(buf_data);
+            data[..buf_data.len()].copy_from_slice(buf_data);
 
             Ok(buf_data.len())
         });
